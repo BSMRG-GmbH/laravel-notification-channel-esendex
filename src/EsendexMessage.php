@@ -1,10 +1,10 @@
 <?php
 
-namespace Bsmrg\LaravelNotificationChannels\Essendex;
+namespace Bsmrg\LaravelNotificationChannels\Esendex;
 
-class EssendexMessage
+class EsendexMessage
 {
-    public $body;
+    public string $body;
 
     public $originator;
 

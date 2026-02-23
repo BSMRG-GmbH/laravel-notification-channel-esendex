@@ -1,6 +1,6 @@
 <?php
 
-namespace Bsmrg\LaravelNotificationChannels\Essendex\Exceptions;
+namespace Bsmrg\LaravelNotificationChannels\Esendex\Exceptions;
 
 use Exception;
 

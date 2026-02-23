@@ -1,5 +1,5 @@
 {
-    "name": "bsmrg-gmbh/laravel-notification-channel-essendex",
+    "name": "bsmrg-gmbh/laravel-notification-channel-esendex",
     "description": "Essendex notification channel for Laravel",
     "authors": [
         {
@@ -18,12 +18,12 @@
     "require-dev": {},
     "autoload": {
         "psr-4": {
-            "Bsmrg\\LaravelNotificationChannels\\Essendex\\": "src"
+            "Bsmrg\\LaravelNotificationChannels\\Esendex\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Bsmrg\\LaravelNotificationChannels\\Essendex\\Test\\": "tests"
+            "Bsmrg\\LaravelNotificationChannels\\Esendex\\Test\\": "tests"
         }
     },
     "config": {
@@ -33,7 +33,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Bsmrg\\LaravelNotificationChannels\\Essendex\\EssendexServiceProvider"
+                "Bsmrg\\LaravelNotificationChannels\\Esendex\\EsendexServiceProvider"
             ]
         }
     }

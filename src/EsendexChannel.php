@@ -1,19 +1,19 @@
 <?php
 
-namespace Bsmrg\LaravelNotificationChannels\Essendex;
+namespace Bsmrg\LaravelNotificationChannels\Esendex;
 
-use Bsmrg\LaravelNotificationChannels\Essendex\Exceptions\CouldNotSendNotification;
+use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\CouldNotSendNotification;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 
-class EssendexChannel
+class EsendexChannel
 {
-    protected EssendexClient $client;
+    protected EsendexClient $client;
 
     private $dispatcher;
 
-    public function __construct(EssendexClient $client, ?Dispatcher $dispatcher = null)
+    public function __construct(EsendexClient $client, ?Dispatcher $dispatcher = null)
     {
         $this->client = $client;
         $this->dispatcher = $dispatcher;
@@ -30,15 +30,15 @@ class EssendexChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        $message = $notification->toEssendex($notifiable);
+        $message = $notification->toEsendex($notifiable);
 
         $data = [];
 
         if (is_string($message)) {
-            $message = EssendexMessage::create($message);
+            $message = EsendexMessage::create($message);
         }
 
-        if ($to = $notifiable->routeNotificationFor('essendex', $notification)) {
+        if ($to = $notifiable->routeNotificationFor('esendex', $notification)) {
             $message->setRecipient($to);
         }
 
@@ -46,7 +46,7 @@ class EssendexChannel
             $data = $this->client->send($message);
 
             if ($this->dispatcher !== null) {
-                $this->dispatcher->dispatch('essendex-sms', [$notifiable, $notification, $data]);
+                $this->dispatcher->dispatch('esendex-sms', [$notifiable, $notification, $data]);
             }
         } catch (CouldNotSendNotification $e) {
             if ($this->dispatcher !== null) {
@@ -54,7 +54,7 @@ class EssendexChannel
                     new NotificationFailed(
                         $notifiable,
                         $notification,
-                        'essendex-sms',
+                        'esendex-sms',
                         $e->getMessage()
                     )
                 );

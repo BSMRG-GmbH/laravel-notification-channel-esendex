@@ -1,6 +1,6 @@
 <?php
 
-namespace Bsmrg\LaravelNotificationChannels\Essendex\Exceptions;
+namespace Bsmrg\LaravelNotificationChannels\Esendex\Exceptions;
 
 use Exception;
 
@@ -12,6 +12,6 @@ class CouldNotSendNotification extends Exception
      */
     public static function serviceRespondedWithAnError(Exception $exception)
     {
-        return new static("Essendex API responded with an error '{$exception->getCode()}: {$exception->getMessage()}'");
+        return new static("Esendex API responded with an error '{$exception->getCode()}: {$exception->getMessage()}'");
     }
 }

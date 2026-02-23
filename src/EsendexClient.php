@@ -1,14 +1,14 @@
 <?php
 
-namespace Bsmrg\LaravelNotificationChannels\Essendex;
+namespace Bsmrg\LaravelNotificationChannels\Esendex;
 
-use Bsmrg\LaravelNotificationChannels\Essendex\Exceptions\CouldNotSendNotification;
-use Bsmrg\LaravelNotificationChannels\Essendex\Exceptions\NoRecipientProvided;
+use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\CouldNotSendNotification;
+use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\NoRecipientProvided;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
-class EssendexClient
+class EsendexClient
 {
     protected $client;
 
@@ -43,7 +43,7 @@ class EssendexClient
      *
      * @throws CouldNotSendNotification
      */
-    public function send(EssendexMessage $message)
+    public function send(EsendexMessage $message)
     {
         if (empty($message->originator)) {
             $message->setOriginator(config('services.essendex.originator'));
@@ -53,15 +53,18 @@ class EssendexClient
         }
 
         try {
-            $response = $this->client->request('POST', 'https://api.essendex.com/v1.0/messagedispatcher', [
-                'body' => [
+            $response = $this->client->request('POST', 'https://api.esendex.com/v1.0/messagedispatcher', [
+                'json' => [
                     'accountreference' => $this->account,
                     'messages' => [
-                        'to' => trim($message->recipient, ' +.-()'),
-                        'body' => $message->body,
+                        [
+                            'to' => trim($message->recipient, ' +.-()'),
+                            'body' => $message->body,
+                        ],
                     ],
                 ],
                 'headers' => [
+                    'Accept' => 'application/json',
                     'Authorization' => 'Basic '.$this->getAuthorizationKey(),
                 ],
             ]);
