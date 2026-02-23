@@ -1,6 +1,6 @@
 <?php
 
-namespace Bsmrg\LaravelNotificationChannels\Esssendex;
+namespace Bsmrg\LaravelNotificationChannels\Esendex;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
