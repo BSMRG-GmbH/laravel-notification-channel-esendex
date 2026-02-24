@@ -6,7 +6,6 @@ use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\CouldNotSendNotificatio
 use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\NoRecipientProvided;
 use Exception;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 
 class EsendexClient
 {
@@ -34,7 +33,7 @@ class EsendexClient
 
     protected function getAuthorizationKey(): string
     {
-        // TODO: use cache and session like as per https://developers.esendex.com/api-reference/#authentication
+        // TODO: use cache and session as per https://developers.esendex.com/api-reference/#authentication
         return base64_encode($this->user.':'.$this->apiKey);
     }
 
@@ -45,11 +44,16 @@ class EsendexClient
      */
     public function send(EsendexMessage $message)
     {
-        if (empty($message->originator)) {
-            $message->setOriginator(config('services.essendex.originator'));
-        }
         if (empty($message->recipient)) {
             throw new NoRecipientProvided;
+        }
+
+        $recipient = $message->recipient;
+        if (! app()->isProduction()) {
+            $recipient = config('services.esendex.test_recipient');
+            if (! $recipient) {
+                throw new Exception('No `test_recipient` set but app is not in production!');
+            }
         }
 
         try {
@@ -58,7 +62,7 @@ class EsendexClient
                     'accountreference' => $this->account,
                     'messages' => [
                         [
-                            'to' => trim($message->recipient, ' +.-()'),
+                            'to' => trim($recipient, ' +.-()'),
                             'body' => $message->body,
                         ],
                     ],
@@ -70,7 +74,6 @@ class EsendexClient
             ]);
 
             $responseAsJson = json_decode($response->getBody()->__toString());
-            Log::debug('Essendex response', ['response' => $responseAsJson]);
 
             return $responseAsJson;
         } catch (Exception $exception) {
