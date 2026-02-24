@@ -2,9 +2,9 @@
 
 namespace Bsmrg\LaravelNotificationChannels\Esendex;
 
+use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\InvalidConfiguration;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
-use NotificationChannels\Messagebird\Exceptions\InvalidConfiguration;
 
 class EsendexServiceProvider extends ServiceProvider
 {
@@ -16,7 +16,7 @@ class EsendexServiceProvider extends ServiceProvider
         $this->app->when(EsendexChannel::class)
             ->needs(EsendexClient::class)
             ->give(function () {
-                $config = config('services.essendex');
+                $config = config('services.esendex');
 
                 if (is_null($config)) {
                     throw InvalidConfiguration::configurationNotSet();
