@@ -9,8 +9,8 @@ class NoRecipientProvided extends Exception
     /**
      * @return static
      */
-    public function __construct()
+    public function __construct($message = '')
     {
-        parent::__construct('A recipient must be provided');
+        parent::__construct($message ?? 'A recipient must be provided');
     }
 }

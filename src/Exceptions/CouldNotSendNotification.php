@@ -10,8 +10,8 @@ class CouldNotSendNotification extends Exception
      * @param  Exception  $exception
      * @return static
      */
-    public static function serviceRespondedWithAnError(Exception $exception)
+    public static function errorOccured(Exception $exception)
     {
-        return new static("Esendex API responded with an error '{$exception->getCode()}: {$exception->getMessage()}'");
+        return new static("There was an error while trying to send a notification: Code '{$exception->getCode()}: {$exception->getMessage()}'");
     }
 }

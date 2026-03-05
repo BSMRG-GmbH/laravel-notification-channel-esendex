@@ -52,7 +52,7 @@ class EsendexClient
         if (! app()->isProduction()) {
             $recipient = config('services.esendex.test_recipient');
             if (! $recipient) {
-                throw new Exception('No `test_recipient` set but app is not in production!');
+                throw new NoRecipientProvided('No `test_recipient` set, but app is not in production!');
             }
         }
 
@@ -77,7 +77,7 @@ class EsendexClient
 
             return $responseAsJson;
         } catch (Exception $exception) {
-            throw CouldNotSendNotification::serviceRespondedWithAnError($exception);
+            throw CouldNotSendNotification::errorOccured($exception);
         }
     }
 }
