@@ -9,11 +9,11 @@ use Illuminate\Notifications\Notification;
 
 class EsendexChannel
 {
-    protected EsendexClient $client;
+    protected EsendexClientInterface $client;
 
     private $dispatcher;
 
-    public function __construct(EsendexClient $client, ?Dispatcher $dispatcher = null)
+    public function __construct(EsendexClientInterface $client, ?Dispatcher $dispatcher = null)
     {
         $this->client = $client;
         $this->dispatcher = $dispatcher;
@@ -35,7 +35,11 @@ class EsendexChannel
         $data = [];
 
         if (is_string($message)) {
-            $message = EsendexMessage::create($message);
+            if($this->client instanceof EsendexClientV2) {
+                $message = EsendexMessageV2::create($message);
+            } else {
+                $message = EsendexMessage::create($message);
+            }
         }
 
         if ($to = $notifiable->routeNotificationFor('esendex', $notification)) {
