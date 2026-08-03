@@ -35,11 +35,7 @@ class EsendexChannel
         $data = [];
 
         if (is_string($message)) {
-            if($this->client instanceof EsendexClientV2) {
-                $message = EsendexMessageV2::create($message);
-            } else {
-                $message = EsendexMessage::create($message);
-            }
+            $message = EsendexMessage::create($message);
         }
 
         if ($to = $notifiable->routeNotificationFor('esendex', $notification)) {
