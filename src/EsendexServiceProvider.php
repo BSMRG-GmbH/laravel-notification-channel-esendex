@@ -14,15 +14,31 @@ class EsendexServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->when(EsendexChannel::class)
-            ->needs(EsendexClient::class)
+            ->needs(EsendexClientInterface::class)
             ->give(function () {
                 $config = config('services.esendex');
 
-                if (is_null($config)) {
-                    throw InvalidConfiguration::configurationNotSet();
+                self::checkConfig($config);
+                
+                if(str_starts_with($config['account'], 'EXDE')) {
+                    return new EsendexClientV2(new Client(), $config);
                 }
 
                 return new EsendexClient(new Client(), $config);
             });
+    }
+
+    protected static function checkConfig(?array $config) {
+        if (!is_array($config) || empty($config)) {
+            throw InvalidConfiguration::configurationNotSet();
+        }
+
+        if(!isset($config['account'])) {
+            throw InvalidConfiguration::entryMissing('account');
+        }
+
+        if(!isset($config['api_key'])) {
+            throw InvalidConfiguration::entryMissing('api_key');
+        }
     }
 }

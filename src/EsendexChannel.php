@@ -9,11 +9,11 @@ use Illuminate\Notifications\Notification;
 
 class EsendexChannel
 {
-    protected EsendexClient $client;
+    protected EsendexClientInterface $client;
 
     private $dispatcher;
 
-    public function __construct(EsendexClient $client, ?Dispatcher $dispatcher = null)
+    public function __construct(EsendexClientInterface $client, ?Dispatcher $dispatcher = null)
     {
         $this->client = $client;
         $this->dispatcher = $dispatcher;

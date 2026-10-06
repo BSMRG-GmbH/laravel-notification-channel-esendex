@@ -7,7 +7,7 @@ use Bsmrg\LaravelNotificationChannels\Esendex\Exceptions\NoRecipientProvided;
 use Exception;
 use GuzzleHttp\Client;
 
-class EsendexClient implements EsendexClientInterface
+class EsendexClientV2 implements EsendexClientInterface
 {
     protected $client;
 
@@ -15,7 +15,7 @@ class EsendexClient implements EsendexClientInterface
 
     protected string $apiKey;
 
-    protected string $user;
+    protected ?string $originator;
 
     /**
      * MessagebirdClient constructor.
@@ -28,13 +28,7 @@ class EsendexClient implements EsendexClientInterface
         $this->client = $client;
         $this->account = $config['account'];
         $this->apiKey = $config['api_key'];
-        $this->user = $config['api_user'];
-    }
-
-    protected function getAuthorizationKey(): string
-    {
-        // TODO: use cache and session as per https://developers.esendex.com/api-reference/#authentication
-        return base64_encode($this->user.':'.$this->apiKey);
+        $this->originator = $config['originator'] ?? null;
     }
 
     /**
@@ -45,7 +39,7 @@ class EsendexClient implements EsendexClientInterface
      */
     public function send(EsendexMessage $message)
     {
-        if (empty($message->recipients) || empty($message->recipients[0])) {
+       if (empty($message->recipients) || empty($message->recipients[0])) {
             throw new NoRecipientProvided;
         }
 
@@ -58,23 +52,55 @@ class EsendexClient implements EsendexClientInterface
             $recipients = [$dummyRecipient];
         }
 
-        $messages = [];
+        $recipientData = [];
         foreach($recipients as $recipient) {
-            $messages[] = [
-                'to' => trim($recipient, ' +.-()'),
-                'body' => $message->text,
+            $recipientData[] = [
+                'msisdn' => $recipient,
             ];
         }
 
+        $requestData = [
+            'accountReference' => $this->account,
+            'channel' => 'SMS',
+            'characterSet' => 'auto',
+        ];
+
+        if($this->originator) {
+            $requestData['from'] = $this->originator;
+        }
+
+        if($message->validity) {
+            $requestData['validity'] = $message->validity->toIso8601String;
+        }
+
+        if($message->messageType) {
+            $requestData['messageType'] = $message->messageType->value;
+        }
+
+        if($message->messageTitle) {
+            $requestData['name'] = $message->messageTitle;
+        }
+
+        $requestData['body'] = [
+            'text' => $message->text
+        ];
+
+        if($message->attachment) {
+            $requestData['body']['attachment'] = [
+               'attachmentUrl' =>  $message->attachment->attachmentUrl,
+               'fileName' => $message->attachment->fileName,
+               'description' => $message->attachment->description
+            ];
+        }
+
+        $requestData['recipients'] = $recipientData;
+
         try {
-            $response = $this->client->request('POST', 'https://api.esendex.com/v1.0/messagedispatcher', [
-                'json' => [
-                    'accountreference' => $this->account,
-                    'messages' => $messages
-                ],
+            $response = $this->client->request('POST', 'https://api.esendex.de/v2/messages', [
+                'json' => $requestData,
                 'headers' => [
                     'Accept' => 'application/json',
-                    'Authorization' => 'Basic '.$this->getAuthorizationKey(),
+                    'X-Api-Key' => $this->apiKey,
                 ],
             ]);
 
